@@ -10,11 +10,8 @@ package
 	
 	public class MiniLD59 extends Sprite
 	{
-		// 
-		[Embed(source = "../assets/images/Default.png" )] protected static var imgSpriteSheet:Class;
-		
 		private var context:Context3D;
-		private var spriteSheet:Bitmap;
+		private var textureAtlas:TextureAtlas;
 		
 		public function MiniLD59()
 		{
@@ -38,9 +35,9 @@ package
 			
 			addEventListener(Event.ENTER_FRAME, onEnterFrame);
 			
-			spriteSheet = new imgSpriteSheet() as Bitmap;
-			spriteSheet.y = 64;
-			addChild(spriteSheet);
+			textureAtlas = new TextureAtlas(context);
+			textureAtlas.bitmap.y = 32;
+			addChild(textureAtlas.bitmap);
 		}
 		
 		private function onEnterFrame(e:Event):void
