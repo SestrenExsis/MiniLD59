@@ -31,7 +31,6 @@ package
 		protected var _context:Context3D;
 		protected var _bitmap:Bitmap;
 		protected var _texture:Texture;
-		protected var _uvRect:Rectangle;
 		
 		public function TextureAtlas(Context:Context3D)
 		{
@@ -42,9 +41,8 @@ package
 			_texture = _context.createTexture(_bitmapData.width, _bitmapData.height, Context3DTextureFormat.BGRA, false);
 			_texture.uploadFromBitmapData(_bitmapData);
 			
-			var _texWidth:uint = _bitmapData.width / ATLAS_WIDTH_IN_TEXTURES;
-			var _texHeight:uint = _bitmapData.height / ATLAS_HEIGHT_IN_TEXTURES;
-			_uvRect = new Rectangle(0, 0, _texWidth, _texHeight);
+			var _texWidth:Number = 1 / ATLAS_WIDTH_IN_TEXTURES;
+			var _texHeight:Number = 1 / ATLAS_HEIGHT_IN_TEXTURES;
 		}
 		
 		public function get bitmap():Bitmap
@@ -61,32 +59,15 @@ package
 		{
 			var _xComponent:uint = TextureIndex % ATLAS_WIDTH_IN_TEXTURES;
 			var _yComponent:uint = TextureIndex / ATLAS_WIDTH_IN_TEXTURES;
-			var _w:Number = _uvRect.width;
-			var _h:Number = _uvRect.height;
+			var _w:Number = 1 / ATLAS_WIDTH_IN_TEXTURES;
+			var _h:Number = 1 / ATLAS_HEIGHT_IN_TEXTURES;
 			
 			var _x0:Number = _w * _xComponent;
 			var _x1:Number = _x0 + _w;
 			var _y0:Number = _h * _yComponent;
 			var _y1:Number = _y0 + _h;
-			Textures.push(_x0, _y0, _x0, _y0, _x0, _y0, _x1, _y0, _x0, _y0, _x0, _y1, _x0, _y0, _x1, _y1);
-		}
-		
-		/**
-		 * Copied with thanks from: http://jacksondunstan.com/articles/2486.
-		 * Get the next-highest power of two
-		 * @param v Value to get the next-highest power of two from
-		 * @return The next-highest power of two from the given value
-		 */
-		private static function nextPowerOfTwo(v:uint):uint
-		{
-			v--;
-			v |= v >> 1;
-			v |= v >> 2;
-			v |= v >> 4;
-			v |= v >> 8;
-			v |= v >> 16;
-			v++;
-			return v;
+			
+			Textures.push(_x0, _y0, _x1, _y0, _x0, _y1, _x1, _y1);
 		}
 	}
 }
