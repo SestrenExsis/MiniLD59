@@ -6,7 +6,9 @@ package
 	import flash.display3D.Context3D;
 	import flash.display3D.Context3DTriangleFace;
 	import flash.events.Event;
+	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
+	import flash.ui.Keyboard;
 	
 	[SWF(width="640", height="480", frameRate="60", backgroundColor="#ff0000")]
 	
@@ -16,6 +18,11 @@ package
 		private var program:VoxelProgram;
 		private var textureAtlas:TextureAtlas;
 		private var camera:ViewpointCamera;
+		
+		private var moveForward:Boolean = false;
+		private var moveBackward:Boolean = false;
+		private var moveLeft:Boolean = false;
+		private var moveRight:Boolean = false;
 		
 		private var _basics:Vector.<VoxelCube>;
 		
@@ -38,21 +45,18 @@ package
 			context = e.target.context3D;
 			context.enableErrorChecking = true;
 			context.configureBackBuffer(640, 480, 0, true);
-			//context.setCulling(Context3DTriangleFace.BACK);
+			context.setCulling(Context3DTriangleFace.BACK);
 			
 			program = new VoxelProgram(context);
-			camera = new ViewpointCamera(0, 0, 0, stage.width, stage.height);
+			camera = new ViewpointCamera(1, 1, 1, stage.width, stage.height);
 			textureAtlas = new TextureAtlas(context);
 			VoxelCube.init(context, program, textureAtlas);
 			
-			stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMoveCamera);
-			stage.addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheelCamera);
-			stage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDownCamera);
+			stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
+			stage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
+			stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
+			stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
 			addEventListener(Event.ENTER_FRAME, onEnterFrame);
-			
-			textureAtlas = new TextureAtlas(context);
-			textureAtlas.bitmap.y = 32;
-			addChild(textureAtlas.bitmap);
 			
 			_basics = new Vector.<VoxelCube>();
 			
@@ -86,46 +90,53 @@ package
 			}
 		}
 		
+		private function onKeyDown(e:KeyboardEvent):void 
+		{ 
+			if (e.keyCode == Keyboard.W)
+				moveForward = true;
+			if (e.keyCode == Keyboard.S)
+				moveBackward = true;
+			if (e.keyCode == Keyboard.A)
+				moveLeft = true;
+			if (e.keyCode == Keyboard.D)
+				moveRight = true;
+		}
 		
+		private function onKeyUp(e:KeyboardEvent):void 
+		{ 
+			if (e.keyCode == Keyboard.W)
+				moveForward = false;
+			if (e.keyCode == Keyboard.S)
+				moveBackward = false;
+			if (e.keyCode == Keyboard.A)
+				moveLeft = false;
+			if (e.keyCode == Keyboard.D)
+				moveRight = false;
+		}
 		
-		private function onMouseMoveCamera(e:MouseEvent):void
+		private function onMouseMove(e:MouseEvent):void
 		{
 			camera.mouseMove(e.stageX, e.stageY);
 		}
 		
-		private function onMouseDownCamera(e:MouseEvent):void
+		private function onMouseDown(e:MouseEvent):void
 		{
-			stage.addEventListener(MouseEvent.MOUSE_UP, onMouseUpCamera);
+			stage.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
 			camera.mouseDown();
 		}
 		
-		private function onMouseUpCamera(e:MouseEvent):void
+		private function onMouseUp(e:MouseEvent):void
 		{
-			removeEventListener(Event.ENTER_FRAME, onMousePressedCamera);
-			stage.removeEventListener(MouseEvent.MOUSE_UP, onMouseUpCamera);
+			removeEventListener(Event.ENTER_FRAME, onMousePressed);
+			stage.removeEventListener(MouseEvent.MOUSE_UP, onMouseUp);
 			camera.mouseUp();
 		}
 		
-		private function onMousePressedCamera(e:MouseEvent):void
+		private function onMousePressed(e:MouseEvent):void
 		{
-			removeEventListener(Event.ENTER_FRAME, onMousePressedCamera);
-			stage.removeEventListener(MouseEvent.MOUSE_UP, onMouseUpCamera);
-			camera.mouseMove(stage.mouseX, stage.mouseY);
-		}
-		
-		private function onMouseWheelCamera(e:MouseEvent):void
-		{
-			camera.mouseWheel(e.delta);
-		}
-		
-		private function onMouseDown(e:MouseEvent):void 
-		{
-			stage.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
-		}
-		
-		private function onMouseUp(e:Event):void
-		{
+			removeEventListener(Event.ENTER_FRAME, onMousePressed);
 			stage.removeEventListener(MouseEvent.MOUSE_UP, onMouseUp);
+			camera.mouseMove(stage.mouseX, stage.mouseY);
 		}
 		
 		private function sortingFunction(ChunkA:VoxelCube, ChunkB:VoxelCube):Number
@@ -141,16 +152,47 @@ package
 		{
 			VoxelCube.preRender();
 			
-			var _voxelChunk:VoxelCube;
+			var _voxelCube:VoxelCube;
 			for (var i:int = 0; i < _basics.length; i++)
 			{
-				_voxelChunk = _basics[i];
-				_voxelChunk.renderScene(camera);
+				_voxelCube = _basics[i];
+				_voxelCube.renderScene(camera);
 			}
+			
 			VoxelCube.postRender();
 			
 			context.present();
-			camera.update();
+			
+			var _angle:Number = 0;
+			var _velocity:Number = 0.0;
+			if (moveForward != moveBackward || moveLeft != moveRight)
+			{
+				if (moveForward && !moveBackward)
+				{
+					_angle = 0;
+					if (moveRight && !moveLeft)
+						_angle -= 45;
+					else if (moveLeft && !moveRight)
+						_angle += 45;
+				}
+				else if (moveBackward && !moveForward)
+				{
+					_angle = 180;
+					if (moveRight && !moveLeft)
+						_angle += 45;
+					else if (moveLeft && !moveRight)
+						_angle -= 45;
+				}
+				else
+				{
+					if (moveRight && !moveLeft)
+						_angle = -90;
+					else if (moveLeft && !moveRight)
+						_angle = 90;
+				}
+				_velocity = 0.25;
+			}
+			camera.update(false, _angle, _velocity);
 		}
 	}
 }

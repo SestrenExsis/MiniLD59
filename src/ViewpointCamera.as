@@ -1,6 +1,7 @@
 package
 {
 	import com.adobe.utils.PerspectiveMatrix3D;
+	
 	import flash.geom.Matrix3D;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
@@ -19,7 +20,6 @@ package
 		protected var _center:Point;
 		
 		public var _position:Vector3D;
-		public var _velocity:Number = 0;
 		public var _pitch:Number = 0;
 		public var _yaw:Number = 0;
 		
@@ -53,7 +53,7 @@ package
 			_mouseIsDown = true;
 		}
 		
-		public function update(ForceTransformation:Boolean = false):void
+		public function update(ForceTransformation:Boolean = false, RelativeAngle:Number = 0.0, Velocity:Number = 0.0):void
 		{
 			var x:Number = _center.x - _mouseX;  
 			var y:Number  = _center.y - _mouseY;
@@ -61,7 +61,7 @@ package
 			var deltaY:Number = _savePos.y - y;
 			_savePos.setTo(x, y);
 			
-			if (_mouseIsDown || _velocity != 0 || ForceTransformation)
+			if (_mouseIsDown || Velocity != 0.0 || ForceTransformation)
 			{
 				_viewTransform.identity();
 				_viewTransform.appendTranslation(_position.x, _position.y, _position.z);
@@ -75,25 +75,24 @@ package
 						_yaw += 360;
 					
 					_pitch = _pitch + deltaY;
-					if (_pitch <= -80)
-						_pitch = -80;
-					else if (_pitch >= 80)
-						_pitch = 80;
+					if (_pitch <= -60)
+						_pitch = -60;
+					else if (_pitch >= 60)
+						_pitch = 60;
 				}
 				
 				_viewTransform.appendRotation(_yaw, Vector3D.Y_AXIS, _position);
 				var _viewRight:Vector3D = rightAxisOf(_viewTransform);
 				_viewTransform.appendRotation(_pitch, _viewRight, _position); //Needs to take the previous rotation into account
 				
-				if (_velocity != 0)
+				if (Velocity != 0.0)
 				{
-					var _viewDir:Vector3D = backAxisOf(_viewTransform);
-					_viewTransform.appendTranslation(_velocity * _viewDir.x, _velocity * _viewDir.y, _velocity * _viewDir.z);
-					
-					_position.x += _velocity * _viewDir.x;
-					_position.y += _velocity * _viewDir.y;
-					_position.z += _velocity * _viewDir.z;
-					_velocity = 0;
+					var _angle:Number = (RelativeAngle - _yaw + 90) * (Math.PI / 180);
+					var _xComponent:Number = Velocity * Math.cos(_angle);
+					var _zComponent:Number = Velocity * Math.sin(_angle);
+					_viewTransform.appendTranslation(_xComponent, 0.0, _zComponent);
+					_position.x += _xComponent;
+					_position.z += _zComponent;
 				}
 				
 				_viewTransform.invert();
@@ -109,11 +108,6 @@ package
 		{
 			_mouseX = mouseX;
 			_mouseY = mouseY;
-		}
-		
-		public function mouseWheel(WheelDelta:int):void
-		{
-			_velocity = WheelDelta / 10;
 		}
 		
 		public function destroy():void
