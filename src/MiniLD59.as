@@ -25,6 +25,7 @@ package
 		private var moveRight:Boolean = false;
 		
 		private var _basics:Vector.<VoxelCube>;
+		private var _sprites:Vector.<SpriteBillboard>;
 		
 		public function MiniLD59()
 		{
@@ -50,7 +51,7 @@ package
 			program = new VoxelProgram(context);
 			camera = new ViewpointCamera(1, 1, 1, stage.width, stage.height);
 			textureAtlas = new TextureAtlas(context);
-			VoxelCube.init(context, program, textureAtlas);
+			Entity.init(context, program, textureAtlas);
 			
 			stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
 			stage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
@@ -59,8 +60,13 @@ package
 			addEventListener(Event.ENTER_FRAME, onEnterFrame);
 			
 			_basics = new Vector.<VoxelCube>();
+			_sprites = new Vector.<SpriteBillboard>();
 			
-			VoxelCube.init(context, program, textureAtlas);
+			_sprites.push(new SpriteBillboard(Entity.TEX_PLAYER_WALK[0], 3, 1, 3));
+			_sprites.push(new SpriteBillboard(Entity.TEX_PLAYER_WALK[0], 3, 1, 6));
+			_sprites.push(new SpriteBillboard(Entity.TEX_PLAYER_WALK[0], 6, 1, 3));
+			_sprites.push(new SpriteBillboard(Entity.TEX_PLAYER_WALK[0], 6, 1, 6));
+			
 			var _textureIndex:int;
 			var _voxelChunk:VoxelCube;
 			for (var x:int = 0; x < 16; x++)
@@ -70,13 +76,13 @@ package
 					for (var z:int = 0; z < 16; z++)
 					{
 						if (y == 0)
-							_textureIndex = VoxelCube.TEX_BLUE_WALL;
+							_textureIndex = Entity.TEX_BLUE_WALL;
 						else if (y == 2)
-							_textureIndex = VoxelCube.TEX_GREEN_WALL;
+							_textureIndex = Entity.TEX_GREEN_WALL;
 						else
 						{
 							if (x == 0 || x == 15 || z == 0 || z == 15)
-								_textureIndex = VoxelCube.TEX_FLOOR;
+								_textureIndex = Entity.TEX_FLOOR;
 							else
 								_textureIndex = -1;
 						}
@@ -150,16 +156,25 @@ package
 		
 		private function onEnterFrame(e:Event):void
 		{
-			VoxelCube.preRender();
+			GameTimer.update();
 			
+			var i:int;
+			Entity.preRender();
 			var _voxelCube:VoxelCube;
-			for (var i:int = 0; i < _basics.length; i++)
+			for (i = 0; i < _basics.length; i++)
 			{
 				_voxelCube = _basics[i];
 				_voxelCube.renderScene(camera);
 			}
 			
-			VoxelCube.postRender();
+			var _sprite:SpriteBillboard;
+			for (i = 0; i < _sprites.length; i++)
+			{
+				_sprite = _sprites[i];
+				_sprite.update();
+				_sprite.renderScene(camera);
+			}
+			Entity.postRender();
 			
 			context.present();
 			
@@ -190,7 +205,7 @@ package
 					else if (moveLeft && !moveRight)
 						_angle = 90;
 				}
-				_velocity = 0.25;
+				_velocity = 0.125;
 			}
 			camera.update(false, _angle, _velocity);
 		}
