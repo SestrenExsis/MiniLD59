@@ -26,6 +26,7 @@ package
 		
 		protected var _position:Vector3D;
 		protected var _textureIndex:int = -2;
+		public var _cameraDistance:Number = 0.0;
 		
 		protected var _textureVertices:Vector.<Number>;
 		protected var _textureVertBuf:VertexBuffer3D;
@@ -77,7 +78,7 @@ package
 		
 		public function getCameraDistance(Camera:ViewpointCamera):Number
 		{
-			var cameraPosition:Vector3D = Camera.viewTransform.position;
+			var cameraPosition:Vector3D = Camera.position;
 			return Vector3D.distance(cameraPosition, _position);
 		}
 		

@@ -99,6 +99,11 @@ package
 			}
 		}
 		
+		public function get position():Vector3D
+		{
+			return _position;
+		}
+		
 		public function mouseUp():void
 		{
 			_mouseIsDown = false;

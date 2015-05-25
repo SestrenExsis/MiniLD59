@@ -112,15 +112,6 @@ package
 			camera.mouseMove(stage.mouseX, stage.mouseY);
 		}
 		
-		private function sortingFunction(ChunkA:VoxelCube, ChunkB:VoxelCube):Number
-		{
-			var chunkADistance:Number = ChunkA.getCameraDistance(camera);
-			var chunkBDistance:Number = ChunkB.getCameraDistance(camera);
-			if (chunkADistance < chunkBDistance) return -1;
-			else if (chunkADistance > chunkBDistance) return 1;
-			else return 0;
-		}
-		
 		private function onEnterFrame(e:Event):void
 		{
 			GameTimer.update();
@@ -152,7 +143,7 @@ package
 					else if (moveLeft && !moveRight)
 						_angle = 90;
 				}
-				_velocity = 0.125;
+				_velocity = 0.075;
 			}
 			camera.update(false, _angle, _velocity);
 			

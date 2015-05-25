@@ -4,6 +4,7 @@ package
 	{
 		protected var _tiles:Vector.<VoxelCube>;
 		protected var _sprites:Vector.<SpriteBillboard>;
+		protected var _camera:ViewpointCamera;
 		
 		public function LevelMap(Width:uint = 16, Height:uint = 16, Depth:uint = 3)
 		{
@@ -30,12 +31,12 @@ package
 							else
 							{
 								_seed = Math.random();
-								if (_seed < 0.02)
+								if (_seed < 0.01)
 									_textureIndex = Entity.TEX_PILLAR;
 								else 
 								{
 									_textureIndex = Entity.TEX_NONE;
-									if (_seed < 0.05)
+									if (_seed < 0.1)
 										_sprites.push(new SpriteBillboard(Entity.TEX_PLAYER_WALK[0], x, y, z));
 								}
 							}
@@ -48,6 +49,15 @@ package
 					}
 				}
 			}
+		}
+		
+		private function sortingFunction(EntityA:Entity, EntityB:Entity):Number
+		{
+			var distA:Number = EntityA.getCameraDistance(_camera);
+			var distB:Number = EntityB.getCameraDistance(_camera);
+			if (distA < distB) return 1;
+			else if (distA > distB) return -1;
+			else return 0;
 		}
 		
 		public function update():void
@@ -71,6 +81,9 @@ package
 		public function render(Camera:ViewpointCamera):void
 		{
 			Entity.preRender();
+			
+			_camera = Camera;
+			_sprites.sort(sortingFunction);
 			
 			var i:int;
 			var _voxelCube:VoxelCube;
