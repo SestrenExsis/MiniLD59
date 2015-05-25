@@ -24,6 +24,7 @@ package
 		private var moveLeft:Boolean = false;
 		private var moveRight:Boolean = false;
 		
+		private var _levelMap:LevelMap;
 		private var _basics:Vector.<VoxelCube>;
 		private var _sprites:Vector.<SpriteBillboard>;
 		
@@ -59,41 +60,7 @@ package
 			stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
 			addEventListener(Event.ENTER_FRAME, onEnterFrame);
 			
-			_basics = new Vector.<VoxelCube>();
-			_sprites = new Vector.<SpriteBillboard>();
-			
-			_sprites.push(new SpriteBillboard(Entity.TEX_PLAYER_WALK[0], 3, 1, 3));
-			_sprites.push(new SpriteBillboard(Entity.TEX_PLAYER_WALK[0], 3, 1, 6));
-			_sprites.push(new SpriteBillboard(Entity.TEX_PLAYER_WALK[0], 6, 1, 3));
-			_sprites.push(new SpriteBillboard(Entity.TEX_PLAYER_WALK[0], 6, 1, 6));
-			
-			var _textureIndex:int;
-			var _voxelChunk:VoxelCube;
-			for (var x:int = 0; x < 16; x++)
-			{
-				for (var y:int = 0; y < 3; y++)
-				{
-					for (var z:int = 0; z < 16; z++)
-					{
-						if (y == 0)
-							_textureIndex = Entity.TEX_BLUE_WALL;
-						else if (y == 2)
-							_textureIndex = Entity.TEX_GREEN_WALL;
-						else
-						{
-							if (x == 0 || x == 15 || z == 0 || z == 15)
-								_textureIndex = Entity.TEX_FLOOR;
-							else
-								_textureIndex = -1;
-						}
-						if (_textureIndex >= 0)
-						{
-							_voxelChunk = new VoxelCube(_textureIndex, x, y, z);
-							_basics.push(_voxelChunk);
-						}
-					}
-				}
-			}
+			_levelMap = new LevelMap(32, 32, 3);
 		}
 		
 		private function onKeyDown(e:KeyboardEvent):void 
@@ -158,26 +125,6 @@ package
 		{
 			GameTimer.update();
 			
-			var i:int;
-			Entity.preRender();
-			var _voxelCube:VoxelCube;
-			for (i = 0; i < _basics.length; i++)
-			{
-				_voxelCube = _basics[i];
-				_voxelCube.renderScene(camera);
-			}
-			
-			var _sprite:SpriteBillboard;
-			for (i = 0; i < _sprites.length; i++)
-			{
-				_sprite = _sprites[i];
-				_sprite.update();
-				_sprite.renderScene(camera);
-			}
-			Entity.postRender();
-			
-			context.present();
-			
 			var _angle:Number = 0;
 			var _velocity:Number = 0.0;
 			if (moveForward != moveBackward || moveLeft != moveRight)
@@ -208,6 +155,10 @@ package
 				_velocity = 0.125;
 			}
 			camera.update(false, _angle, _velocity);
+			
+			_levelMap.update();
+			_levelMap.render(camera);
+			context.present();
 		}
 	}
 }

@@ -12,10 +12,15 @@ package
 	
 	public class SpriteBillboard extends Entity
 	{
+		private static var _initialized:Boolean = false;
+		
 		protected static const SPRITE_INDICES:Vector.<uint> = Vector.<uint>([0,  1,  2,  2,  1,  3]);
 		protected static const SPRITE_VERTICES:Vector.<Number> = Vector.<Number>([
 			-0.375, 0.25, 0.0,   0.375, 0.25, 0.0,  -0.375,-0.5, 0.0,   0.375,-0.5, 0.0
 		]);
+		
+		protected static var positionVertexBuffer:VertexBuffer3D;
+		protected static var indexBuffer:IndexBuffer3D;
 		
 		protected var _animationTimer:int = 0;
 		protected var _curFrame:int = 0;
@@ -26,16 +31,44 @@ package
 			
 			setTextureIndexTo(TextureIndex);
 			
-			_positionVertBuf = _context.createVertexBuffer(4, 3);
-			_positionVertBuf.uploadFromVector(SPRITE_VERTICES, 0, 4);
-			
-			_indexBuf = _context.createIndexBuffer(6);
-			_indexBuf.uploadFromVector(SPRITE_INDICES, 0, 6);
+			if (!_initialized)
+				initBuffers();
 		}
 		
-		override public function renderScene(Camera:ViewpointCamera, FaceCamera:Boolean = true):void
+		public static function initBuffers():void
 		{
-			super.renderScene(Camera, true);
+			positionVertexBuffer = _context.createVertexBuffer(4, 3);
+			positionVertexBuffer.uploadFromVector(SPRITE_VERTICES, 0, 4);
+			
+			indexBuffer = _context.createIndexBuffer(6);
+			indexBuffer.uploadFromVector(SPRITE_INDICES, 0, 6);
+			
+			_initialized = true;
+		}
+		
+		override public function renderScene(Camera:ViewpointCamera):void
+		{
+			if (_textureIndex < 0)
+				return;
+			
+			_context.setVertexBufferAt(0, positionVertexBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
+			_context.setVertexBufferAt(1, TextureAtlas.getVertexBuffer(_textureIndex), 0, Context3DVertexBufferFormat.FLOAT_2);
+			
+			// From worldSpace to cameraSpace
+			_m1.identity();
+			_m1.appendTranslation(_position.x, _position.y, _position.z);
+			
+			// Use billboarding to force the Entity to face the camera
+			var dX:Number = _position.x - Camera._position.x;
+			var dZ:Number = _position.z - Camera._position.z;
+			var _angle:Number = Math.atan2(dX, dZ) * (180 / Math.PI);
+			_m1.appendRotation(_angle, Vector3D.Y_AXIS, _position);
+			
+			_m1.append(Camera.viewTransform);
+			_m1.append(Camera.projectionTransform);
+			
+			_context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, _m1, true);
+			_context.drawTriangles(indexBuffer);
 		}
 		
 		override public function update():void
@@ -48,16 +81,6 @@ package
 				_curFrame = (_curFrame + 1) % TEX_PLAYER_WALK.length
 				setTextureIndexTo(TEX_PLAYER_WALK[_curFrame]);
 			}
-		}
-		
-		override public function setTextureIndexTo(TextureIndex:int):void
-		{
-			super.setTextureIndexTo(TextureIndex);
-			
-			_textureVertices = new Vector.<Number>();
-			_textureAtlas.pushUVCoordinatesToVector(_textureVertices, _textureIndex);
-			_textureVertBuf = _context.createVertexBuffer(4, 2);
-			_textureVertBuf.uploadFromVector(_textureVertices, 0, 4);
 		}
 	}
 }

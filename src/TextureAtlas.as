@@ -6,6 +6,7 @@ package
 	import flash.display.BitmapData;
 	import flash.display3D.Context3D;
 	import flash.display3D.Context3DTextureFormat;
+	import flash.display3D.VertexBuffer3D;
 	import flash.display3D.textures.Texture;
 	import flash.geom.Rectangle;
 	import flash.geom.Vector3D;
@@ -28,7 +29,8 @@ package
 		public static const FLOORS:Array = [39, 58, 59, 60, 61, 62];
 		public static const CEILINGS:Array = [47, 58, 59, 60, 61, 62];
 		
-		protected var _context:Context3D;
+		protected static var _textureVertexBuffers:Vector.<VertexBuffer3D>;
+		protected static var _context:Context3D;
 		protected var _bitmap:Bitmap;
 		protected var _texture:Texture;
 		
@@ -41,8 +43,41 @@ package
 			_texture = _context.createTexture(_bitmapData.width, _bitmapData.height, Context3DTextureFormat.BGRA, false);
 			_texture.uploadFromBitmapData(_bitmapData);
 			
-			var _texWidth:Number = 1 / ATLAS_WIDTH_IN_TEXTURES;
-			var _texHeight:Number = 1 / ATLAS_HEIGHT_IN_TEXTURES;
+			_textureVertexBuffers = new Vector.<VertexBuffer3D>();
+			
+			var _textureCount:int = ATLAS_WIDTH_IN_TEXTURES * ATLAS_HEIGHT_IN_TEXTURES;
+			var _spriteCount:int = 0.5 * _textureCount;
+			var _textureVertices:Vector.<Number>;
+			var _textureVertBuf:VertexBuffer3D;
+			for (var i:int = 0; i < _textureCount; i++)
+			{
+				_textureVertices = new Vector.<Number>();
+				if (i < _spriteCount)
+				{
+					pushUVCoordinatesToVector(_textureVertices, i);
+					_textureVertBuf = _context.createVertexBuffer(4, 2);
+					_textureVertBuf.uploadFromVector(_textureVertices, 0, 4);
+				}
+				else
+				{
+					pushUVCoordinatesToVector(_textureVertices, i);
+					pushUVCoordinatesToVector(_textureVertices, i);
+					pushUVCoordinatesToVector(_textureVertices, i);
+					pushUVCoordinatesToVector(_textureVertices, i);
+					pushUVCoordinatesToVector(_textureVertices, i);
+					pushUVCoordinatesToVector(_textureVertices, i);
+					
+					_textureVertBuf = _context.createVertexBuffer(24, 2);
+					_textureVertBuf.uploadFromVector(_textureVertices, 0, 24);
+				}
+				
+				_textureVertexBuffers.push(_textureVertBuf);
+			}
+		}
+		
+		public static function getVertexBuffer(TextureIndex:uint):VertexBuffer3D
+		{
+			return _textureVertexBuffers[TextureIndex];
 		}
 		
 		public function get bitmap():Bitmap
@@ -55,7 +90,7 @@ package
 			return _texture;
 		}
 		
-		public function pushUVCoordinatesToVector(Textures:Vector.<Number>, TextureIndex:uint):void
+		public function pushUVCoordinatesToVector(Textures:Vector.<Number>, TextureIndex:uint, FlipHorizontal:Boolean = false):void
 		{
 			var _xComponent:uint = TextureIndex % ATLAS_WIDTH_IN_TEXTURES;
 			var _yComponent:uint = TextureIndex / ATLAS_WIDTH_IN_TEXTURES;
@@ -67,7 +102,10 @@ package
 			var _y0:Number = _h * _yComponent;
 			var _y1:Number = _y0 + _h;
 			
-			Textures.push(_x0, _y0, _x1, _y0, _x0, _y1, _x1, _y1);
+			if (FlipHorizontal)
+				Textures.push(_x1, _y0, _x0, _y0, _x1, _y1, _x0, _y1);
+			else
+				Textures.push(_x0, _y0, _x1, _y0, _x0, _y1, _x1, _y1);
 		}
 	}
 }

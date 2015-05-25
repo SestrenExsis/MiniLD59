@@ -16,19 +16,19 @@ package
 		protected static var _program:VoxelProgram;
 		protected static var _m1:Matrix3D;
 		
-		public static const TEX_BLUE_WALL:uint = 48;
-		public static const TEX_GREEN_WALL:uint = 52;
-		public static const TEX_CEILING:uint = 47;
-		public static const TEX_FLOOR:uint = 39;
-		public static const TEX_PLAYER_WALK:Vector.<uint> = Vector.<uint>([1, 2]);
+		public static const TEX_NONE:int = -1;
+		public static const TEX_BLUE_WALL:int = 48;
+		public static const TEX_GREEN_WALL:int = 52;
+		public static const TEX_PILLAR:int = 56;
+		public static const TEX_CEILING:int = 47;
+		public static const TEX_FLOOR:int = 39;
+		public static const TEX_PLAYER_WALK:Vector.<int> = Vector.<int>([1, 2]);
 		
 		protected var _position:Vector3D;
 		protected var _textureIndex:int = -2;
 		
 		protected var _textureVertices:Vector.<Number>;
 		protected var _textureVertBuf:VertexBuffer3D;
-		protected var _positionVertBuf:VertexBuffer3D;
-		protected var _indexBuf:IndexBuffer3D;
 		
 		public function Entity(X:Number = 0, Y:Number = 0, Z:Number = 0)
 		{
@@ -65,32 +65,9 @@ package
 			_context.setVertexBufferAt(1, null);
 		}
 		
-		public function renderScene(Camera:ViewpointCamera, FaceCamera:Boolean = false):void
+		public function renderScene(Camera:ViewpointCamera):void
 		{
-			if (_textureIndex < 0)
-				return;
 			
-			_context.setVertexBufferAt(0, _positionVertBuf, 0, Context3DVertexBufferFormat.FLOAT_3);
-			_context.setVertexBufferAt(1, _textureVertBuf, 0, Context3DVertexBufferFormat.FLOAT_2);
-			
-			// From worldSpace to cameraSpace
-			_m1.identity();
-			_m1.appendTranslation(_position.x, _position.y, _position.z);
-			
-			// Use billboarding to force the Entity to face the camera
-			if (FaceCamera)
-			{
-				var dX:Number = _position.x - Camera._position.x;
-				var dZ:Number = _position.z - Camera._position.z;
-				var _angle:Number = Math.atan2(dX, dZ) * (180 / Math.PI);
-				_m1.appendRotation(_angle, Vector3D.Y_AXIS, _position);
-			}
-			
-			_m1.append(Camera.viewTransform);
-			_m1.append(Camera.projectionTransform);
-			
-			_context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, _m1, true);
-			_context.drawTriangles(_indexBuf);
 		}
 		
 		public function update():void
