@@ -50,7 +50,7 @@ package
 			context.setCulling(Context3DTriangleFace.BACK);
 			
 			program = new VoxelProgram(context);
-			camera = new ViewpointCamera(1, 1, 1, stage.width, stage.height);
+			camera = new ViewpointCamera(1, 0, 1, stage.width, stage.height);
 			textureAtlas = new TextureAtlas(context);
 			Entity.init(context, program, textureAtlas);
 			
@@ -60,7 +60,7 @@ package
 			stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
 			addEventListener(Event.ENTER_FRAME, onEnterFrame);
 			
-			_levelMap = new LevelMap(32, 32, 3);
+			_levelMap = new LevelMap(32, 32);
 		}
 		
 		private function onKeyDown(e:KeyboardEvent):void 

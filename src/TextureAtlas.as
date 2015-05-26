@@ -29,7 +29,8 @@ package
 		public static const FLOORS:Array = [39, 58, 59, 60, 61, 62];
 		public static const CEILINGS:Array = [47, 58, 59, 60, 61, 62];
 		
-		protected static var _textureVertexBuffers:Vector.<VertexBuffer3D>;
+		protected static var _wallVertexBuffers:Vector.<VertexBuffer3D>;
+		protected static var _floorVertexBuffers:Vector.<VertexBuffer3D>;
 		protected static var _context:Context3D;
 		protected var _bitmap:Bitmap;
 		protected var _texture:Texture;
@@ -43,7 +44,7 @@ package
 			_texture = _context.createTexture(_bitmapData.width, _bitmapData.height, Context3DTextureFormat.BGRA, false);
 			_texture.uploadFromBitmapData(_bitmapData);
 			
-			_textureVertexBuffers = new Vector.<VertexBuffer3D>();
+			_wallVertexBuffers = new Vector.<VertexBuffer3D>();
 			
 			var _textureCount:int = ATLAS_WIDTH_IN_TEXTURES * ATLAS_HEIGHT_IN_TEXTURES;
 			var _spriteCount:int = 0.5 * _textureCount;
@@ -71,13 +72,28 @@ package
 					_textureVertBuf.uploadFromVector(_textureVertices, 0, 24);
 				}
 				
-				_textureVertexBuffers.push(_textureVertBuf);
+				_wallVertexBuffers.push(_textureVertBuf);
+			}
+			
+			_floorVertexBuffers = new Vector.<VertexBuffer3D>();
+			
+			var _floorVertexBuffer:VertexBuffer3D;
+			for (i = 0; i < Math.min(FLOORS.length, CEILINGS.length); i++)
+			{
+				_textureVertices = new Vector.<Number>();
+				pushUVCoordinatesToVector(_textureVertices, FLOORS[i]);
+				pushUVCoordinatesToVector(_textureVertices, CEILINGS[i]);
+				_floorVertexBuffer = _context.createVertexBuffer(8, 2);
+				_floorVertexBuffer.uploadFromVector(_textureVertices, 0, 8);
+				_floorVertexBuffers.push(_floorVertexBuffer);
 			}
 		}
 		
-		public static function getVertexBuffer(TextureIndex:uint):VertexBuffer3D
+		public static function getVertexBuffer(TextureIndex:int):VertexBuffer3D
 		{
-			return _textureVertexBuffers[TextureIndex];
+			if (TextureIndex >= 0)
+				return _wallVertexBuffers[TextureIndex];
+			return _floorVertexBuffers[(-1 * TextureIndex) - 1];
 		}
 		
 		public function get bitmap():Bitmap
