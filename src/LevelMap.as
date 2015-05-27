@@ -5,20 +5,24 @@ package
 		protected var _tiles:Vector.<VoxelCube>;
 		protected var _sprites:Vector.<SpriteBillboard>;
 		protected var _camera:ViewpointCamera;
+		protected var _widthInTiles:uint;
+		protected var _heightInTiles:uint;
 		
 		public function LevelMap(Width:uint = 16, Height:uint = 16)
 		{
 			_tiles = new Vector.<VoxelCube>();
 			_sprites = new Vector.<SpriteBillboard>();
+			_widthInTiles = Width;
+			_heightInTiles = Height;
 			
 			var _seed:Number;
 			var _textureIndex:int;
 			var _voxelCube:VoxelCube;
-			for (var x:int = 0; x < Width; x++)
+			for (var x:int = 0; x < _widthInTiles; x++)
 			{
-				for (var z:int = 0; z < Height; z++)
+				for (var z:int = 0; z < _heightInTiles; z++)
 				{
-					if (x == 0 || x == Width - 1 || z == 0 || z == Height - 1)
+					if (x == 0 || x == _widthInTiles - 1 || z == 0 || z == _heightInTiles - 1)
 						_textureIndex = Entity.TEX_FLOOR;
 					else
 					{
@@ -45,6 +49,17 @@ package
 			if (distA < distB) return 1;
 			else if (distA > distB) return -1;
 			else return 0;
+		}
+		
+		public function getTileAtPosition(X:Number, Z:Number):VoxelCube
+		{
+			var _x:int = Math.round(X);
+			var _z:int = Math.round(Z);
+			
+			if (_x < 0 || _x >= _widthInTiles || _z < 0 || _z >= _heightInTiles)
+				return null;
+			else
+				return _tiles[_x + _widthInTiles * _z];
 		}
 		
 		public function update():void

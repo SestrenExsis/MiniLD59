@@ -52,6 +52,11 @@ package
 				initBuffers();
 		}
 		
+		public function get solid():Boolean
+		{
+			return _textureIndex >= 0;
+		}
+		
 		public static function initBuffers():void
 		{
 			fillPositionVertexBuffer = _context.createVertexBuffer(24, 3);

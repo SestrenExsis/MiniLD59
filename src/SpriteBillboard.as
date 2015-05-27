@@ -24,12 +24,14 @@ package
 		
 		protected var _animationTimer:int = 0;
 		protected var _curFrame:int = 0;
+		protected var _angle:Number = 0.0;
 		
 		public function SpriteBillboard(TextureIndex:int, X:Number = 0, Y:Number = 0, Z:Number = 0)
 		{
 			super(X, Y, Z);
-			
+
 			setTextureIndexTo(TextureIndex);
+			setSizeTo(0.75, 0.75, 0.75);
 			
 			if (!_initialized)
 				initBuffers();
@@ -81,6 +83,44 @@ package
 				_curFrame = (_curFrame + 1) % TEX_PLAYER_WALK.length
 				setTextureIndexTo(TEX_PLAYER_WALK[_curFrame]);
 			}
+		}
+		
+		public function move(Map:LevelMap, Angle:Number = 0.0, Velocity:Number = 0.0):void
+		{
+			if (Velocity != 0.0)
+			{
+				var _angle:Number = (Angle - angle + 90) * (Math.PI / 180);
+				var _width:Number = 0.5 * _size.x;
+				var _height:Number = 0.5 * _size.z;
+				var _xComponent:Number = Velocity * Math.cos(_angle) + _width;
+				var _zComponent:Number = Velocity * Math.sin(_angle) + _height;
+				
+				var _tile:VoxelCube = Map.getTileAtPosition(_position.x + _xComponent, _position.z + _zComponent);
+				if (_tile.solid)
+				{
+					
+				}
+				else
+				{
+					_position.x += _xComponent - _width;
+					_position.z += _zComponent - _height;
+				}
+			}
+		}
+		
+		public function get angle():Number
+		{
+			return _angle;
+		}
+		
+		public function set angle(Value:Number):void
+		{
+			_angle = Value;
+			
+			if (_angle > 180)
+				_angle -= 360;
+			else if (_angle < -180)
+				_angle += 360;
 		}
 	}
 }

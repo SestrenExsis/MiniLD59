@@ -26,14 +26,16 @@ package
 		
 		protected var _position:Vector3D;
 		protected var _textureIndex:int = -2;
-		public var _cameraDistance:Number = 0.0;
-		
 		protected var _textureVertices:Vector.<Number>;
 		protected var _textureVertBuf:VertexBuffer3D;
+		protected var _size:Vector3D;
+		
+		public var _cameraDistance:Number = 0.0;
 		
 		public function Entity(X:Number = 0, Y:Number = 0, Z:Number = 0)
 		{
 			_position = new Vector3D(X, Y, Z);
+			_size = new Vector3D(1.0, 1.0, 1.0);
 		}
 		
 		public static function init(Context:Context3D, Program:VoxelProgram, TextureAtlasA:TextureAtlas):void
@@ -93,6 +95,21 @@ package
 				return;
 			
 			_textureIndex = TextureIndex;
+		}
+		
+		public function get position():Vector3D
+		{
+			return _position;
+		}
+		
+		public function get size():Vector3D
+		{
+			return _size;
+		}
+		
+		public function setSizeTo(X:Number = 1.0, Y:Number = 1.0, Z:Number = 1.0):void
+		{
+			_size.setTo(X, Y, Z);
 		}
 	}
 }
