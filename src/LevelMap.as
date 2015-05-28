@@ -51,15 +51,12 @@ package
 			else return 0;
 		}
 		
-		public function getTileAtPosition(X:Number, Z:Number):VoxelCube
+		public function getTileAt(X:int, Z:int):VoxelCube
 		{
-			var _x:int = Math.round(X);
-			var _z:int = Math.round(Z);
-			
-			if (_x < 0 || _x >= _widthInTiles || _z < 0 || _z >= _heightInTiles)
+			if (X < 0 || X >= _widthInTiles || Z < 0 || Z >= _heightInTiles)
 				return null;
 			else
-				return _tiles[_x + _widthInTiles * _z];
+				return _tiles[X * _widthInTiles + Z];
 		}
 		
 		public function update():void
