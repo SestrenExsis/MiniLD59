@@ -29,6 +29,12 @@ package
 		public static const FLOORS:Array = [39, 58, 59, 60, 61, 62];
 		public static const CEILINGS:Array = [47, 58, 59, 60, 61, 62];
 		
+		public static const ITEM_POINTS:uint = 0;
+		public static const ITEM_POWERUP:uint = 1;
+		public static const ITEM_SHOT:uint = 2;
+		public static const ITEM_HEALTH:uint = 3;
+		public static const ITEM_DESTRUCTIBLE:uint = 4;
+		
 		protected static var _wallVertexBuffers:Vector.<VertexBuffer3D>;
 		protected static var _floorVertexBuffers:Vector.<VertexBuffer3D>;
 		protected static var _context:Context3D;

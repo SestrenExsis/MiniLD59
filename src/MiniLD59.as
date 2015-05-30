@@ -33,7 +33,7 @@ package
 		private var _center:Point;
 		
 		private var _levelMap:LevelMap;
-		private var _player:SpriteBillboard;
+		private var _player:MovingSprite;
 		
 		public function MiniLD59()
 		{
@@ -71,7 +71,7 @@ package
 			addEventListener(Event.ENTER_FRAME, onEnterFrame);
 			
 			_levelMap = new LevelMap(32, 32);
-			_player = new SpriteBillboard(0, 1, 0, 1);
+			_player = new MovingSprite(0, 1, 0, 1);
 		}
 		
 		private function onKeyDown(e:KeyboardEvent):void 

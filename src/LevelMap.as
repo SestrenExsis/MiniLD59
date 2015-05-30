@@ -3,7 +3,7 @@ package
 	public class LevelMap
 	{
 		protected var _tiles:Vector.<VoxelCube>;
-		protected var _sprites:Vector.<SpriteBillboard>;
+		protected var _sprites:Vector.<MovingSprite>;
 		protected var _camera:ViewpointCamera;
 		protected var _widthInTiles:uint;
 		protected var _heightInTiles:uint;
@@ -11,7 +11,7 @@ package
 		public function LevelMap(Width:uint = 16, Height:uint = 16)
 		{
 			_tiles = new Vector.<VoxelCube>();
-			_sprites = new Vector.<SpriteBillboard>();
+			_sprites = new Vector.<MovingSprite>();
 			_widthInTiles = Width;
 			_heightInTiles = Height;
 			
@@ -33,7 +33,7 @@ package
 						{
 							_textureIndex = Entity.TEX_NONE;
 							if (_seed < 0.1)
-								_sprites.push(new SpriteBillboard(Entity.TEX_PLAYER_WALK[0], x, 0, z));
+								_sprites.push(new MovingSprite(Entity.TEX_PLAYER_WALK[0], x, 0, z));
 						}
 					}
 					_voxelCube = new VoxelCube(_textureIndex, x, 0, z);
@@ -69,7 +69,7 @@ package
 				_voxelCube.update();
 			}
 			
-			var _sprite:SpriteBillboard;
+			var _sprite:MovingSprite;
 			for (i = 0; i < _sprites.length; i++)
 			{
 				_sprite = _sprites[i];
