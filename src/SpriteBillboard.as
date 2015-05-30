@@ -14,8 +14,9 @@ package
 	{
 		private static var _initialized:Boolean = false;
 		
-		protected static const SPRITE_INDICES:Vector.<uint> = Vector.<uint>([0,  1,  2,  2,  1,  3]);
+		protected static const SPRITE_INDICES:Vector.<uint> = Vector.<uint>([0, 1, 2, 2, 1, 3,   4, 5, 6, 6, 5, 7]);
 		protected static const SPRITE_VERTICES:Vector.<Number> = Vector.<Number>([
+			-0.375, 0.25, 0.0,   0.375, 0.25, 0.0,  -0.375,-0.5, 0.0,   0.375,-0.5, 0.0,
 			-0.375, 0.25, 0.0,   0.375, 0.25, 0.0,  -0.375,-0.5, 0.0,   0.375,-0.5, 0.0
 		]);
 		
@@ -25,6 +26,7 @@ package
 		protected var _animationTimer:int = 0;
 		protected var _curFrame:int = 0;
 		protected var _angle:Number = 0.0;
+		//protected var _facing:uint = 0;
 		
 		public function SpriteBillboard(TextureIndex:int, X:Number = 0, Y:Number = 0, Z:Number = 0)
 		{
@@ -39,11 +41,11 @@ package
 		
 		public static function initBuffers():void
 		{
-			positionVertexBuffer = _context.createVertexBuffer(4, 3);
-			positionVertexBuffer.uploadFromVector(SPRITE_VERTICES, 0, 4);
+			positionVertexBuffer = _context.createVertexBuffer(8, 3);
+			positionVertexBuffer.uploadFromVector(SPRITE_VERTICES, 0, 8);
 			
-			indexBuffer = _context.createIndexBuffer(6);
-			indexBuffer.uploadFromVector(SPRITE_INDICES, 0, 6);
+			indexBuffer = _context.createIndexBuffer(12);
+			indexBuffer.uploadFromVector(SPRITE_INDICES, 0, 12);
 			
 			_initialized = true;
 		}
@@ -63,14 +65,22 @@ package
 			// Use billboarding to force the Entity to face the camera
 			var dX:Number = _position.x - Camera._position.x;
 			var dZ:Number = _position.z - Camera._position.z;
-			var _angle:Number = Math.atan2(dX, dZ) * (180 / Math.PI);
-			_m1.appendRotation(_angle, Vector3D.Y_AXIS, _position);
+			var _viewAngle:Number = Math.atan2(dX, dZ) * (180 / Math.PI);
+			_m1.appendRotation(_viewAngle, Vector3D.Y_AXIS, _position);
 			
 			_m1.append(Camera.viewTransform);
 			_m1.append(Camera.projectionTransform);
 			
 			_context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, _m1, true);
-			_context.drawTriangles(indexBuffer);
+			
+			var _facing:uint = ((_viewAngle - _angle) / 90 + 4) % 4; // TODO: Double-check that this doesn't need an offset
+			var _facingFrame:uint = (_facing >= 3) ? 1 : _facing;
+			setTextureIndexTo(3 * _facingFrame + TEX_PLAYER_WALK[_curFrame]);
+			
+			if (_facing < 3)
+				_context.drawTriangles(indexBuffer, 0, 2);
+			else
+				_context.drawTriangles(indexBuffer, 6, 2);
 		}
 		
 		override public function update():void
@@ -81,7 +91,6 @@ package
 			{
 				_animationTimer -= 500;
 				_curFrame = (_curFrame + 1) % TEX_PLAYER_WALK.length
-				setTextureIndexTo(TEX_PLAYER_WALK[_curFrame]);
 			}
 		}
 		

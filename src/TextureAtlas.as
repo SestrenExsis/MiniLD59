@@ -46,18 +46,20 @@ package
 			
 			_wallVertexBuffers = new Vector.<VertexBuffer3D>();
 			
+			var i:int;
 			var _textureCount:int = ATLAS_WIDTH_IN_TEXTURES * ATLAS_HEIGHT_IN_TEXTURES;
 			var _spriteCount:int = 0.5 * _textureCount;
 			var _textureVertices:Vector.<Number>;
 			var _textureVertBuf:VertexBuffer3D;
-			for (var i:int = 0; i < _textureCount; i++)
+			for (i = 0; i < _textureCount; i++)
 			{
 				_textureVertices = new Vector.<Number>();
 				if (i < _spriteCount)
 				{
-					pushUVCoordinatesToVector(_textureVertices, i);
-					_textureVertBuf = _context.createVertexBuffer(4, 2);
-					_textureVertBuf.uploadFromVector(_textureVertices, 0, 4);
+					pushUVCoordinatesToVector(_textureVertices, i, false);
+					pushUVCoordinatesToVector(_textureVertices, i, true);
+					_textureVertBuf = _context.createVertexBuffer(8, 2);
+					_textureVertBuf.uploadFromVector(_textureVertices, 0, 8);
 				}
 				else
 				{

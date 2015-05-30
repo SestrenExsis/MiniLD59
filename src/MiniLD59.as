@@ -57,7 +57,7 @@ package
 			context = e.target.context3D;
 			context.enableErrorChecking = true;
 			context.configureBackBuffer(640, 480, 0, true);
-			context.setCulling(Context3DTriangleFace.BACK);
+			//context.setCulling(Context3DTriangleFace.BACK);
 			
 			program = new VoxelProgram(context);
 			camera = new ViewpointCamera(1, 0, 1, stage.width, stage.height);
