@@ -3,7 +3,7 @@ package
 	public class LevelMap
 	{
 		protected var _tiles:Vector.<VoxelCube>;
-		protected var _sprites:Vector.<MovingSprite>;
+		protected var _sprites:Vector.<SpriteBillboard>;
 		protected var _camera:ViewpointCamera;
 		protected var _widthInTiles:uint;
 		protected var _heightInTiles:uint;
@@ -11,7 +11,7 @@ package
 		public function LevelMap(Width:uint = 16, Height:uint = 16)
 		{
 			_tiles = new Vector.<VoxelCube>();
-			_sprites = new Vector.<MovingSprite>();
+			_sprites = new Vector.<SpriteBillboard>();
 			_widthInTiles = Width;
 			_heightInTiles = Height;
 			
@@ -23,17 +23,25 @@ package
 				for (var z:int = 0; z < _heightInTiles; z++)
 				{
 					if (x == 0 || x == _widthInTiles - 1 || z == 0 || z == _heightInTiles - 1)
-						_textureIndex = Entity.TEX_FLOOR;
+						_textureIndex = Entity.TEX_GRAY_STONE;
 					else
 					{
+						if ((x % 8) == 4 && (z % 8) == 4)
+							_textureIndex = Entity.TEX_LIT_FLOOR;
+						else
+							_textureIndex = Entity.TEX_EMPTY_FLOOR;
+						
 						_seed = Math.random();
-						if (_seed < 0.01)
-							_textureIndex = Entity.TEX_PILLAR;
-						else 
+						if (_seed < 0.05)
 						{
-							_textureIndex = Entity.TEX_NONE;
-							if (_seed < 0.1)
-								_sprites.push(new MovingSprite(Entity.TEX_PLAYER_WALK[0], x, 0, z));
+							var _itemIndex:uint = _seed * 20 * TextureAtlas.ITEMS.length;
+							_sprites.push(new SpriteBillboard(TextureAtlas.ITEMS[_itemIndex], x, 0, z));
+						}
+						else if (_seed < 0.07)
+							_textureIndex = Entity.TEX_BLUE_STONE;
+						else if (_seed < 0.09)
+						{
+							_sprites.push(new MovingSprite(Entity.TEX_PLAYER_WALK[0], x, 0, z));
 						}
 					}
 					_voxelCube = new VoxelCube(_textureIndex, x, 0, z);
@@ -69,7 +77,7 @@ package
 				_voxelCube.update();
 			}
 			
-			var _sprite:MovingSprite;
+			var _sprite:SpriteBillboard;
 			for (i = 0; i < _sprites.length; i++)
 			{
 				_sprite = _sprites[i];

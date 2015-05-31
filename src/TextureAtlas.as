@@ -26,8 +26,8 @@ package
 		public static const BLOCKS_B:Array = [40, 41, 42, 43, 44, 45, 46];
 		public static const WALLS_A:Array = [48, 49, 50, 51];
 		public static const WALLS_B:Array = [52, 53, 54, 55];
-		public static const FLOORS:Array = [39, 58, 59, 60, 61, 62];
-		public static const CEILINGS:Array = [47, 58, 59, 60, 61, 62];
+		public static const FLOORS:Array = [47, 58, 60, 61];
+		public static const CEILINGS:Array = [39, 59, 61, 62];
 		
 		public static const ITEM_POINTS:uint = 0;
 		public static const ITEM_POWERUP:uint = 1;

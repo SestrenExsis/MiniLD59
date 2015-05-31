@@ -16,12 +16,17 @@ package
 		protected static var _program:VoxelProgram;
 		protected static var _m1:Matrix3D;
 		
-		public static const TEX_NONE:int = -1;
-		public static const TEX_BLUE_WALL:int = 48;
-		public static const TEX_GREEN_WALL:int = 52;
+		public static const TEX_EMPTY_FLOOR:int = -1;
+		public static const TEX_LIT_FLOOR:int = -2;
+		public static const TEX_BROWN_WALL:int = 40;
+		public static const TEX_WOOD:int = 41;
+		public static const TEX_GRAY_STONE:int = 48;
+		public static const TEX_BROWN_STONE:int = 49;
+		public static const TEX_MOSSY_STONE:int = 50;
+		public static const TEX_BLUE_STONE:int = 51;
 		public static const TEX_PILLAR:int = 56;
-		public static const TEX_CEILING:int = 47;
-		public static const TEX_FLOOR:int = 39;
+		//public static const TEX_CEILING_LAMP:int = 47;
+		//public static const TEX_FLOOR:int = 39;
 		public static const TEX_PLAYER_WALK:Vector.<int> = Vector.<int>([1, 2]);
 		
 		protected var _position:Vector3D;
