@@ -130,7 +130,7 @@ package
 			_center = value;
 		}
 		
-		public function update(ForceTransformation:Boolean = false, RelativeAngle:Number = 0.0, Velocity:Number = 0.0):void
+		public function update():void
 		{
 			var x:Number = _center.x - _mouseX;  
 			var y:Number  = _center.y - _mouseY;
@@ -138,22 +138,14 @@ package
 			var deltaY:Number = _savePos.y - y;
 			_savePos.setTo(x, y);
 			
-			if (_mouseIsDown || Velocity != 0.0 || ForceTransformation)
+			if (_mouseIsDown)
 			{
-				if (_mouseIsDown)
-				{
-					_player.angle = _player.angle + deltaX;
-					if (_player.angle > 180)
-						_player.angle -= 360;
-					else if (_player.angle < -180)
-						_player.angle += 360;
-					
-					_pitch = _pitch + deltaY;
-					if (_pitch <= -60)
-						_pitch = -60;
-					else if (_pitch >= 60)
-						_pitch = 60;
-				}
+				_player.angle += deltaX;
+				_pitch = _pitch + deltaY;
+				if (_pitch <= -22.5)
+					_pitch = -22.5;
+				else if (_pitch >= 22.5)
+					_pitch = 22.5;
 			}
 		}
 		
@@ -190,7 +182,7 @@ package
 				}
 				_velocity = 0.075;
 			}
-			update(false, _angle, _velocity);
+			update();
 			
 			_player.move(_levelMap, _angle, _velocity);
 			camera.update(_player.angle, _pitch, _player.position);

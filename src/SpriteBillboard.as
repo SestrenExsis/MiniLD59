@@ -69,7 +69,7 @@ package
 			_context.drawTriangles(indexBuffer, 0, 2);
 		}
 		
-		override public function update():void
+		override public function update(Map:LevelMap = null):void
 		{
 			
 		}

@@ -41,7 +41,7 @@ package
 							_textureIndex = Entity.TEX_BLUE_STONE;
 						else if (_seed < 0.09)
 						{
-							_sprites.push(new MovingSprite(Entity.TEX_PLAYER_WALK[0], x, 0, z));
+							_sprites.push(new MovingSprite(Entity.TEX_PLAYER_WALK[0], x, 0, z, true));
 						}
 					}
 					_voxelCube = new VoxelCube(_textureIndex, x, 0, z);
@@ -81,7 +81,7 @@ package
 			for (i = 0; i < _sprites.length; i++)
 			{
 				_sprite = _sprites[i];
-				_sprite.update();
+				_sprite.update(this);
 			}
 		}
 		

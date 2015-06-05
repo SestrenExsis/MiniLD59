@@ -29,17 +29,24 @@ package
 		//public static const TEX_FLOOR:int = 39;
 		public static const TEX_PLAYER_WALK:Vector.<int> = Vector.<int>([1, 2]);
 		
-		protected var _position:Vector3D;
-		protected var _textureIndex:int = -2;
 		protected var _textureVertices:Vector.<Number>;
 		protected var _textureVertBuf:VertexBuffer3D;
+		
 		protected var _size:Vector3D;
+		protected var _position:Vector3D; // The w value is used to store facing angle in the XZ plane.
+		protected var _targetPosition:Vector3D;
+		protected var _moveSpeed:Number;
+		protected var _rotationSpeed:Number;
+		
+		protected var _textureIndex:int = -2;
+		protected var _frameIndex:int = 0;
+		protected var _frameTimer:Number = 0;
 		
 		public var _cameraDistance:Number = 0.0;
 		
-		public function Entity(X:Number = 0, Y:Number = 0, Z:Number = 0)
+		public function Entity(X:Number = 0.0, Y:Number = 0.0, Z:Number = 0.0, Angle:Number = 0.0)
 		{
-			_position = new Vector3D(X, Y, Z);
+			_position = new Vector3D(X, Y, Z, Angle);
 			_size = new Vector3D(1.0, 1.0, 1.0);
 		}
 		
@@ -78,7 +85,7 @@ package
 			
 		}
 		
-		public function update():void
+		public function update(Map:LevelMap = null):void
 		{
 			
 		}
@@ -115,6 +122,76 @@ package
 		public function setSizeTo(X:Number = 1.0, Y:Number = 1.0, Z:Number = 1.0):void
 		{
 			_size.setTo(X, Y, Z);
+		}
+		
+		public function get angle():Number
+		{
+			return _position.w;
+		}
+		
+		public function set angle(Value:Number):void
+		{
+			position.w = Value;
+			
+			if (Value > 180)
+				position.w -= 360;
+			else if (Value < -180)
+				position.w += 360;
+		}
+		
+		public function move(Map:LevelMap, Angle:Number = 0.0, Velocity:Number = 0.0):void
+		{
+			if (Velocity != 0.0)
+			{
+				var _relativeAngle:Number = (Angle - angle + 90) * (Math.PI / 180);
+				var _xComponent:Number = Velocity * Math.cos(_relativeAngle);
+				var _zComponent:Number = Velocity * Math.sin(_relativeAngle);
+				var _dirX:int = (_xComponent < 0) ? -1 : 1;
+				var _dirZ:int = (_zComponent < 0) ? -1 : 1;
+				var _width:Number = 0.5 * _dirX * _size.x;
+				var _height:Number = 0.5 * _dirZ * _size.z;
+				_xComponent += _width;
+				_zComponent += _height;
+				
+				var _xMax:Number = _xComponent;
+				var _zMax:Number = _zComponent;
+				
+				var _tile:VoxelCube;
+				var _x1:Number = Math.round(_position.x);
+				var _x2:Number = Math.round(_position.x + _xComponent);
+				var _z1:Number = Math.round(_position.z);
+				var _z2:Number = Math.round(_position.z + _zComponent);
+				
+				if (_x1 != _x2)
+				{
+					_tile = Map.getTileAt(_x2, _z1);
+					if (!_tile || _tile.solid) // Player hits the x-boundary of a new tile
+						_xMax = (_x1 + 0.5 * _dirX) - _position.x;
+				}
+				
+				if (_z1 != _z2)
+				{
+					_tile = Map.getTileAt(_x1, _z2);
+					if (!_tile || _tile.solid) // Player hits the z-boundary of a new tile
+						_zMax = (_z1 + 0.5 * _dirZ) - _position.z;
+				}
+				
+				if (_x1 != _x2 && _z1 != _z2)
+				{
+					_tile = Map.getTileAt(_x2, _z2);
+					if (!_tile || _tile.solid) // Player hits the tile diagonally across
+					{
+						// TODO: Change this to favor whichever one involves the smallest change in velocity
+						if (_xComponent < _zComponent)
+							_xMax = (_x1 + 0.5 * _dirX) - _position.x;
+						else
+							_zMax = (_z1 + 0.5 * _dirZ) - _position.z;
+					}
+				}
+				
+				_position.x += _xMax - _width;
+				_position.z += _zMax - _height;
+			}
 		}
 	}
 }
