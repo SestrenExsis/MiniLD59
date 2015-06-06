@@ -18,19 +18,35 @@ package
 			-0.375, 0.25, 0.0,   0.375, 0.25, 0.0,  -0.375,-0.5, 0.0,   0.375,-0.5, 0.0,
 			-0.375, 0.25, 0.0,   0.375, 0.25, 0.0,  -0.375,-0.5, 0.0,   0.375,-0.5, 0.0
 		]);
-		
 		protected static var positionVertexBuffer:VertexBuffer3D;
 		protected static var indexBuffer:IndexBuffer3D;
 		
-		public function SpriteBillboard(TextureIndex:int, X:Number = 0, Y:Number = 0, Z:Number = 0)
+		public static const TYPE_PLAYER:int = 0;
+		public static const TYPE_ENEMY:int = 1;
+		public static const TYPE_BULLET:int = 2;
+		
+		protected var _spriteType:int = -1;
+		
+		public function SpriteBillboard(TextureIndex:int, X:Number = 0, Y:Number = 0, Z:Number = 0, SpriteType:int = -1)
 		{
 			super(X, Y, Z);
 
 			setTextureIndexTo(TextureIndex);
-			setSizeTo(0.75, 0.75, 0.75);
+			size = 0.75;
+			_spriteType = SpriteType;
 			
 			if (!_initialized)
 				initBuffers();
+		}
+		
+		public function get spriteType():int
+		{
+			return _spriteType;
+		}
+		
+		public function set spriteType(Value:int):void
+		{
+			_spriteType = Value;
 		}
 		
 		public static function initBuffers():void
@@ -46,7 +62,7 @@ package
 		
 		override public function renderScene(Camera:ViewpointCamera):void
 		{
-			if (_textureIndex < 0)
+			if (_textureIndex < 0 || !visible)
 				return;
 			
 			_context.setVertexBufferAt(0, positionVertexBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);
@@ -72,6 +88,21 @@ package
 		override public function update(Map:LevelMap = null):void
 		{
 			
+		}
+		
+		public function overlaps(OtherSprite:SpriteBillboard):Boolean
+		{
+			var _distance:Number = Vector3D.distance(position, OtherSprite.position);
+			if (_distance < (0.5 * size + 0.5 * OtherSprite.size))
+			{
+				if ((spriteType == TYPE_BULLET) && (OtherSprite.spriteType == TYPE_ENEMY))
+					OtherSprite.visible = false;
+				else if ((spriteType == TYPE_ENEMY) && (OtherSprite.spriteType == TYPE_BULLET))
+					visible = false;
+				return true;
+			}
+			else
+				return false;
 		}
 	}
 }

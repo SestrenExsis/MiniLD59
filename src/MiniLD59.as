@@ -24,6 +24,7 @@ package
 		private var moveBackward:Boolean = false;
 		private var moveLeft:Boolean = false;
 		private var moveRight:Boolean = false;
+		private var shoot:Boolean = false;
 		
 		private var _pitch:Number = 0.0;
 		private var _mouseX:Number = 0.0;
@@ -34,6 +35,8 @@ package
 		
 		private var _levelMap:LevelMap;
 		private var _player:MovingSprite;
+		private var _bullet:SpriteBillboard;
+		private var _bulletVelocity:Number = 0.0;
 		
 		public function MiniLD59()
 		{
@@ -72,6 +75,8 @@ package
 			
 			_levelMap = new LevelMap(32, 32);
 			_player = new MovingSprite(0, 1, 0, 1);
+			_bullet = new SpriteBillboard(TextureAtlas.ITEM_SHOT, -1, -1, -1);
+			_levelMap.addSprite(_bullet);
 		}
 		
 		private function onKeyDown(e:KeyboardEvent):void 
@@ -84,6 +89,8 @@ package
 				moveLeft = true;
 			if (e.keyCode == Keyboard.D)
 				moveRight = true;
+			if (e.keyCode == Keyboard.SPACE)
+				shoot = true;
 		}
 		
 		private function onKeyUp(e:KeyboardEvent):void 
@@ -96,6 +103,8 @@ package
 				moveLeft = false;
 			if (e.keyCode == Keyboard.D)
 				moveRight = false;
+			if (e.keyCode == Keyboard.SPACE)
+				shoot = false;
 		}
 		
 		private function onMouseMove(e:MouseEvent):void
@@ -182,13 +191,32 @@ package
 				}
 				_velocity = 0.075;
 			}
+			if (shoot)
+			{
+				_bullet.position.copyFrom(_player.position);
+				_bullet.spriteType = SpriteBillboard.TYPE_BULLET;
+				_bullet.size = 0.25;
+				_bullet.angle = _player.angle;
+				_bulletVelocity = 0.60;
+			}
+			
+			if (_bulletVelocity != 0.0)
+			{
+				if (_bullet.move(_levelMap, 0, _bulletVelocity, true))
+					_bulletVelocity = 0.0;
+			}
+			
 			update();
 			
 			_player.move(_levelMap, _angle, _velocity);
 			camera.update(_player.angle, _pitch, _player.position);
 			
 			_levelMap.update();
+			
+			//Entity.preRender();
 			_levelMap.render(camera);
+			//_bullet.renderScene(camera);
+			//Entity.postRender();
 			context.present();
 		}
 	}

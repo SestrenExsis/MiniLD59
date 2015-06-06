@@ -17,8 +17,11 @@ package
 		{
 			super(TextureIndex, X, Y, Z);
 			
+			size = 0.5;
 			_animationTimer += Math.random() * 500;
 			isEnemy = IsEnemy;
+			if (isEnemy)
+				spriteType = SpriteBillboard.TYPE_ENEMY;
 		}
 		
 		override public function update(Map:LevelMap = null):void
@@ -43,7 +46,7 @@ package
 		
 		override public function renderScene(Camera:ViewpointCamera):void
 		{
-			if (_textureIndex < 0)
+			if (_textureIndex < 0 || !visible)
 				return;
 			
 			_context.setVertexBufferAt(0, positionVertexBuffer, 0, Context3DVertexBufferFormat.FLOAT_3);

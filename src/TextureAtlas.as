@@ -21,19 +21,21 @@ package
 		public static const PLAYER:Array = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 		public static const ENEMY_A:Array = [9, 10, 11, 12, 13, 14, 15, 16, 17];
 		public static const ENEMY_B:Array = [18, 19, 20, 21, 22, 23, 24, 25, 26];
-		public static const ITEMS:Array = [27, 28, 29, 30, 31];
+		
+		public static const ITEMS:Array = [27, 28, 30, 31];
+		public static const ITEM_POINTS:uint = 0;
+		public static const ITEM_POWERUP:uint = 1;
+		public static const ITEM_HEALTH:uint = 2;
+		public static const ITEM_DESTRUCTIBLE:uint = 3;
+		
+		public static const ITEM_SHOT:uint = 29;
+		
 		public static const BLOCKS_A:Array = [32, 33, 34, 35, 36, 37, 38];
 		public static const BLOCKS_B:Array = [40, 41, 42, 43, 44, 45, 46];
 		public static const WALLS_A:Array = [48, 49, 50, 51];
 		public static const WALLS_B:Array = [52, 53, 54, 55];
 		public static const FLOORS:Array = [47, 58, 60, 61];
 		public static const CEILINGS:Array = [39, 59, 61, 62];
-		
-		public static const ITEM_POINTS:uint = 0;
-		public static const ITEM_POWERUP:uint = 1;
-		public static const ITEM_SHOT:uint = 2;
-		public static const ITEM_HEALTH:uint = 3;
-		public static const ITEM_DESTRUCTIBLE:uint = 4;
 		
 		protected static var _wallVertexBuffers:Vector.<VertexBuffer3D>;
 		protected static var _floorVertexBuffers:Vector.<VertexBuffer3D>;

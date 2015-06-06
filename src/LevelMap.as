@@ -50,6 +50,11 @@ package
 			}
 		}
 		
+		public function addSprite(SpriteToAdd:SpriteBillboard):void
+		{
+			_sprites.push(SpriteToAdd);
+		}
+		
 		private function sortingFunction(EntityA:Entity, EntityB:Entity):Number
 		{
 			var distA:Number = EntityA.getCameraDistance(_camera);
@@ -82,6 +87,10 @@ package
 			{
 				_sprite = _sprites[i];
 				_sprite.update(this);
+				for (var j:int = 0; j < i; j++)
+				{
+					_sprite.overlaps(_sprites[j]);
+				}
 			}
 		}
 		
